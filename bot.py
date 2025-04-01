@@ -3,6 +3,9 @@ import json
 import random
 import re
 import html
+import asyncio
+from dotenv import load_dotenv
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -12,6 +15,9 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
+
+# Загрузка переменных окружения из .env
+load_dotenv()
 
 # Загружаем задания
 with open("tasks.json", "r", encoding="utf-8") as f:
@@ -107,7 +113,7 @@ async def next_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_task(query.message, user_id)
 
 # 🚀 Запуск
-def main():
+async def main():
     app = ApplicationBuilder().token(os.environ["TOKEN"]).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -115,7 +121,7 @@ def main():
     app.add_handler(CallbackQueryHandler(next_question, pattern="^next_question$"))
 
     print("🤖 Бот запущен!")
-    app.run_polling()
+    await app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
